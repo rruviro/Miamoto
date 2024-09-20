@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import '../model/student.dart';
 
 class StudentRepository {
-  final String apiUrl = 'http://192.168.0.147/studentApi'; 
+  final String apiUrl = 'http://127.0.0.1/studentApi'; 
 
   Future<List<Student>> fetchStudents() async {
     try {
