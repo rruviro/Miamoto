@@ -1,5 +1,4 @@
 class Student {
-
   final String studentID;
   final String firstname;
   final String lastname;
@@ -37,5 +36,4 @@ class Student {
       'enrolled': enrolled,
     };
   }
-
 }

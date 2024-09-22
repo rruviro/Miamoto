@@ -12,11 +12,9 @@ class StudentBloc extends Bloc<StudentEvent, StudentState> {
     on<LoadStudents>((event, emit) async {
       try {
         final students = await repository.fetchStudents();
-        print('Data loaded: ${students.length} students found');
-        if (students.isEmpty) {
-          print('No students in the database');
-        }
-        emit(StudentLoaded(students));
+        final studentCount = students.length;
+        print('Data loaded: $studentCount students found');
+        emit(StudentLoaded(students, studentCount));
       } catch (e) {
         print('Error loading data: $e');
         emit(const StudentError("Failed to load students"));
@@ -27,17 +25,13 @@ class StudentBloc extends Bloc<StudentEvent, StudentState> {
       if (state is StudentLoaded) {
         try {
           await repository.addStudent(event.student);
-          print('Student added: ${event.student}');
           final currentStudents = (state as StudentLoaded).students;
-          final updatedStudents = List<Student>.from(currentStudents)
-            ..add(event.student);
-          emit(StudentLoaded(updatedStudents));
+          final updatedStudents = List<Student>.from(currentStudents)..add(event.student);
+          final updatedCount = updatedStudents.length;
+          emit(StudentLoaded(updatedStudents, updatedCount));
         } catch (e) {
-          print('Error adding student: $e');
           emit(const StudentError("Failed to add student"));
         }
-      } else {
-        print('State is not StudentLoaded');
       }
     });
 
@@ -45,14 +39,13 @@ class StudentBloc extends Bloc<StudentEvent, StudentState> {
       if (state is StudentLoaded) {
         try {
           await repository.updateStudent(event.student);
-          print('Student updated: ${event.student}');
           final updatedStudents = (state as StudentLoaded)
               .students
               .map((student) => student.studentID == event.student.studentID ? event.student : student)
               .toList();
-          emit(StudentLoaded(updatedStudents));
+          final updatedCount = updatedStudents.length;
+          emit(StudentLoaded(updatedStudents, updatedCount));
         } catch (e) {
-          print('Error updating student: $e');
           emit(const StudentError("Failed to update student"));
         }
       }
@@ -62,15 +55,13 @@ class StudentBloc extends Bloc<StudentEvent, StudentState> {
       if (state is StudentLoaded) {
         try {
           await repository.deleteStudent(event.studentID);
-          print('Successfully deleted student with ID: ${event.studentID}');
           final updatedStudents = (state as StudentLoaded)
               .students
               .where((student) => student.studentID != event.studentID)
               .toList();
-          emit(StudentLoaded(updatedStudents));
-        } catch (e, stackTrace) {
-          print('Error deleting student: $e');
-          print('Stack trace: $stackTrace');
+          final updatedCount = updatedStudents.length;
+          emit(StudentLoaded(updatedStudents, updatedCount));
+        } catch (e) {
           emit(StudentError('Failed to delete student: $e'));
         }
       }

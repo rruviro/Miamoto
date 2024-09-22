@@ -3,17 +3,23 @@ import 'package:http/http.dart' as http;
 import '../model/student.dart';
 
 class StudentRepository {
-  final String apiUrl = 'http://127.0.0.1/studentApi'; 
+  // final String apiUrl = 'http://127.0.0.1/studentApi'; 
+  final String apiUrl = 'http://192.168.0.147/studentApi'; 
 
   Future<List<Student>> fetchStudents() async {
     try {
       final response = await http.get(Uri.parse('$apiUrl/read.php'));
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        // Ensure data is not null and is a List
-        if (data is List) {
-          return data.map((json) => Student.fromJson(json)).toList();
+        // Decode the JSON response
+        final Map<String, dynamic> jsonResponse = json.decode(response.body);
+
+        // Check if the expected structure exists
+        if (jsonResponse.containsKey('students')) {
+          final List<dynamic> studentsJson = jsonResponse['students'];
+
+          // Convert the list of dynamic maps into a list of Student objects
+          return studentsJson.map((json) => Student.fromJson(json)).toList();
         } else {
           throw Exception('Unexpected data format');
         }
