@@ -28,7 +28,7 @@ class UpdateStudent extends StudentEvent {
 }
 
 class DeleteStudent extends StudentEvent {
-  final int studentID;
+  final String studentID;
 
   const DeleteStudent(this.studentID);
 

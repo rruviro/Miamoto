@@ -40,15 +40,15 @@ class StudentRepository {
   Future<void> addStudent(Student student) async {
     try {
       final response = await http.post(
-        Uri.parse('$apiUrl/create.php'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(student.toJson()),
+        Uri.parse('${apiUrl}/create.php'),
+        body: {
+          'firstname': student.firstname,
+          'lastname': student.lastname,
+          'course': student.course,
+          'year': student.year, // Send year as a string
+          'enrolled': student.enrolled ? '1' : '0',
+        },
       );
-
-      if (response.statusCode != 201) {
-        print('Failed to add student. Status code: ${response.statusCode}, Body: ${response.body}');
-        throw Exception('Failed to add student');
-      }
     } catch (e) {
       print('Exception while adding student: $e');
       throw Exception('Failed to add student: ${e.toString()}');
@@ -58,36 +58,52 @@ class StudentRepository {
   Future<void> updateStudent(Student student) async {
     try {
       final response = await http.put(
-        Uri.parse('$apiUrl/update.php?studentID=${student.studentID}'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(student.toJson()),
+          Uri.parse('$apiUrl/update.php?studentID=${student.studentID}'),
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          body: {
+              'studentID': student.studentID,
+              'firstname': student.firstname,
+              'lastname': student.lastname,
+              'course': student.course,
+              'year': student.year, // Send year as a string
+              'enrolled': student.enrolled ? '1' : '0',
+          },
       );
 
-      if (response.statusCode != 200) {
-        print('Failed to update student. Status code: ${response.statusCode}, Body: ${response.body}');
-        throw Exception('Failed to update student');
+      if (response.statusCode == 200) {
+          final responseBody = json.decode(response.body);
+          if (responseBody['status'] == 'success') {
+              print('Student updated successfully: ${responseBody['message']}');
+          } else {
+              print('Failed to update student: ${responseBody['message']}');
+              throw Exception('Failed to update student: ${responseBody['message']}');
+          }
+      } else {
+          print('Failed to update student. Status code: ${response.statusCode}, Body: ${response.body}');
+          throw Exception('Failed to update student');
       }
-    } catch (e) {
+  } catch (e) {
       print('Exception while updating student: $e');
       throw Exception('Failed to update student: ${e.toString()}');
-    }
   }
+}
+
 
   Future<void> deleteStudent(int studentID) async {
     try {
       final response = await http.delete(
-        Uri.parse('$apiUrl/delete.php?studentID=$studentID'),
+        Uri.parse('http://192.168.0.147/studentApi/delete.php?studentID=$studentID'),
       );
 
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
       if (response.statusCode == 204 || response.statusCode == 200) {
-        // 204 No Content or 200 OK, deletion is successful
         print('Successfully deleted student with ID: $studentID');
       } else if (response.statusCode == 404) {
-        // Student not found
         print('Student with ID $studentID not found.');
         throw Exception('Student not found');
       } else {
-        // Other errors
         print('Failed to delete student. Status code: ${response.statusCode}, Body: ${response.body}');
         throw Exception('Failed to delete student');
       }

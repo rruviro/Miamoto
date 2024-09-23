@@ -1,6 +1,9 @@
+// ignore_for_file: prefer_const_constructors
 import 'package:crud/backend/bloc/student_bloc.dart';
 import 'package:crud/backend/model/student.dart';
+import 'package:crud/frontend/details.dart';
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -17,6 +20,7 @@ class _HomeState extends State<Home> {
     double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: const Color.fromARGB(255, 11, 166, 222),
         title: Center(
           child: Text(
@@ -34,7 +38,7 @@ class _HomeState extends State<Home> {
           horizontal: 15
         ),
         child: ListView(
-          physics: const NeverScrollableScrollPhysics(), // Disable scrolling
+          physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true, 
           children: [
             Container(
@@ -183,6 +187,7 @@ class _HomeState extends State<Home> {
                     right: 0,
                     child: InkWell(
                       onTap: (){
+                        _showCreateDialog(context);
                       },
                       child: Icon(
                         Icons.group_add_sharp,
@@ -246,24 +251,53 @@ class _HomeState extends State<Home> {
                                     Positioned(
                                       top: 15,
                                       right: 15,
-                                      child: GestureDetector(
-                                        onTap:(){  
-                                          _showUpdateDialog(context, student);
-                                        },
-                                        child: Container(
-                                          width: 30,
-                                          height: 30,
-                                          decoration: const BoxDecoration(
-                                            color: Color.fromARGB(255, 11, 166, 222),
-                                            shape: BoxShape.circle,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          GestureDetector(
+                                            onTap:(){  
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => detail(student: student),
+                                                ),
+                                              );
+                                            },
+                                            child: Container(
+                                              width: 30,
+                                              height: 30,
+                                              decoration: BoxDecoration(
+                                                color: const Color.fromARGB(255, 11, 166, 222),
+                                                borderRadius: BorderRadius.circular(10),
+                                              ),
+                                              child: const Icon(
+                                                Icons.arrow_outward_rounded,
+                                                color: Colors.white,
+                                                size: 15,
+                                              ),
+                                            ),
                                           ),
-                                          child: const Icon(
-                                            Icons.arrow_outward_rounded,
-                                            color: Colors.white,
-                                            size: 15,
+                                          SizedBox(height: 10),
+                                          GestureDetector(
+                                          onTap:(){  
+                                            _showDeleteDialog(context, student);
+                                          },
+                                          child: Container(
+                                            width: 30,
+                                            height: 30,
+                                            decoration: BoxDecoration(
+                                              color: const Color.fromARGB(255, 238, 67, 58),
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
+                                            child: const Icon(
+                                              Icons.delete,
+                                              color: Colors.white,
+                                              size: 15,
+                                            ),
                                           ),
                                         ),
-                                      ),
+                                        ],
+                                      )
                                     ),
                                     Positioned(
                                       top: 20,
@@ -280,7 +314,7 @@ class _HomeState extends State<Home> {
                                             ),
                                           ),
                                           Text(
-                                            "Course : Bachelor of information in science",
+                                            "Course : ${student.course}",
                                             style: GoogleFonts.inter(
                                               color: Colors.grey,
                                               fontSize: 11,
@@ -333,13 +367,316 @@ class _HomeState extends State<Home> {
     );
   }
 
-  void _showUpdateDialog(BuildContext context, Student student) {
+void _showCreateDialog(BuildContext context) {
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _courseController = TextEditingController();
+  int _countFirstName = 0;
+  int _countLastName = 0;
+  String _selectedYear = 'First Year';
+  bool _isEnrolled = false;
+
+  showDialog(
+    context: context, 
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        title: Container(
+          width: double.infinity,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(top: 5),
+                child: Icon(Icons.drive_folder_upload_outlined),
+              ),
+              SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Create New Student',
+                    style: GoogleFonts.inter(
+                      color: Colors.black,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    'Enter new student details',
+                    style: GoogleFonts.inter(
+                      color: Colors.grey,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        content: Container(
+          height: 300,
+          width: double.infinity,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: _firstNameController,
+                      decoration: InputDecoration(
+                        border: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.grey),
+                        ),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Color.fromARGB(255, 11, 166, 222)),
+                        ),
+                        hintText: 'First Name',
+                        hintStyle: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                        suffix: Text('$_countFirstName/25', style: TextStyle(color: Color.fromARGB(255, 11, 166, 222), fontSize: 12)),
+                      ),
+                      onChanged: (value) {
+                        _countFirstName = value.length;
+                      },
+                      keyboardType: TextInputType.text,
+                      textInputAction: TextInputAction.done,
+                      style: TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.w500),
+                      validator: (value) => value == null || value.isEmpty ? 'First name is required' : null,
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: TextFormField(
+                      controller: _lastNameController,
+                      decoration: InputDecoration(
+                        border: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.grey),
+                        ),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Color.fromARGB(255, 11, 166, 222)),
+                        ),
+                        hintText: 'Last Name',
+                        hintStyle: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                        suffix: Text('$_countLastName/25', style: TextStyle(color: Color.fromARGB(255, 11, 166, 222), fontSize: 12)),
+                      ),
+                      onChanged: (value) {
+                        _countLastName = value.length;
+                      },
+                      keyboardType: TextInputType.text,
+                      textInputAction: TextInputAction.done,
+                      style: TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 10),
+              TextFormField(
+                controller: _courseController,
+                decoration: InputDecoration(
+                  border: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Color.fromARGB(255, 11, 166, 222)),
+                  ),
+                  hintText: 'Course',
+                  hintStyle: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                ),
+                keyboardType: TextInputType.text,
+                textInputAction: TextInputAction.done,
+                style: TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.w500),
+              ),
+              SizedBox(height: 20),
+              DropdownButtonFormField<String>(
+                value: _selectedYear,
+                items: [
+                  DropdownMenuItem(value: 'First Year', child: Text('First Year', style: GoogleFonts.inter(fontSize: 13))),
+                  DropdownMenuItem(value: 'Second Year', child: Text('Second Year', style: GoogleFonts.inter(fontSize: 13))),
+                  DropdownMenuItem(value: 'Third Year', child: Text('Third Year', style: GoogleFonts.inter(fontSize: 13))),
+                  DropdownMenuItem(value: 'Fourth Year', child: Text('Fourth Year', style: GoogleFonts.inter(fontSize: 13))),
+                  DropdownMenuItem(value: 'Fifth Year', child: Text('Fifth Year', style: GoogleFonts.inter(fontSize: 13))),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    _selectedYear = value!;
+                  });
+                },
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  labelText: 'Year',
+                  labelStyle: TextStyle(fontSize: 15),
+                  prefixIcon: const Icon(Icons.calendar_month_outlined, color: Color.fromARGB(255, 11, 166, 222)),
+                ),
+                validator: (value) => value == null ? 'Year is required' : null,
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () async {
+                  if (_firstNameController.text.isEmpty ||
+                      _lastNameController.text.isEmpty ||
+                      _courseController.text.isEmpty ||
+                      _selectedYear.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: Color(0xFF0BA6DE),
+                        content: Text('Please fill in all fields'),
+                      ),
+                    );
+                    return;
+                  }
+                  final studentData = Student(
+                    studentID: '', 
+                    firstname: _firstNameController.text,
+                    lastname: _lastNameController.text,
+                    course: _courseController.text,
+                    year: _selectedYear,
+                    enrolled: _isEnrolled,
+                  );
+
+                  try {
+                    context.read<StudentBloc>().add(AddStudent(studentData));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: Color(0xFF0BA6DE),
+                        content: Text('New student added'),
+                      ),
+                    );
+                    Navigator.pop(context);
+                  } catch (e) {
+                    print('Error adding student: $e');
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: Color(0xFF0BA6DE),
+                        content: Text('Failed to save student: $e'),
+                      ),
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF0BA6DE),
+                  minimumSize: Size(double.infinity, 60),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    'Create',
+                    style: GoogleFonts.inter(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+void _showDeleteDialog (BuildContext context, Student student) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Delete',
+              style: GoogleFonts.inter(
+                color: Colors.black,
+                fontSize: 15,
+                fontWeight: FontWeight.w600
+              ),
+            ),
+            Text(
+              'Do you insist deleting ${student.lastname}\'s details',
+              style: GoogleFonts.inter(
+                color: Colors.grey,
+                fontSize: 11,
+                fontWeight: FontWeight.w400
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          GestureDetector(
+            onTap: (){
+              context.read<StudentBloc>().add(DeleteStudent(student.studentID));
+              Navigator.pop(context);
+            },
+            child: Container(
+              height: 30,
+              width: 112,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(2),
+                color: Color.fromARGB(255, 11, 166, 222)
+              ),
+              child: Center( 
+                child: Text(
+                  'Yes',
+                  style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600 
+                  ),
+                ),
+              ),
+            ),
+          ),
+          GestureDetector(
+            onTap: (){
+              Navigator.pop(context);
+            },
+            child: Container(
+              height: 30,
+              width: 112,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(2),
+                color: Color.fromARGB(255, 11, 166, 222),
+              ),
+              child: Center(
+                child:Text(
+                  'No',
+                  style: GoogleFonts.inter(
+                    color: const Color.fromARGB(190, 255, 255, 255),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600 
+                  ),
+                ),
+              )
+            ),
+          ),
+        ],
+      );
+    }
+  );
+}
+
+void _showUpdateDialog(BuildContext context, Student student) {
+
     final TextEditingController _firstNameController = TextEditingController(text: student.firstname);
     final TextEditingController _LastNameController = TextEditingController(text: student.lastname);
     final TextEditingController _courseController = TextEditingController(text: student.course);
     int _countFirstName = student.firstname.length;
     int _countLastName = student.lastname.length;
-    String _selectedYear = "First Year";
+    String _selectedYear = student.year;
+    bool _isEnrolled = false;
 
     showDialog(
       context: context, 
@@ -556,9 +893,66 @@ class _HomeState extends State<Home> {
                 ),
                 SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    if (_firstNameController.text.isEmpty ||
+                      _LastNameController.text.isEmpty ||
+                      _courseController.text.isEmpty ||
+                      _selectedYear.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          backgroundColor: Color(0xFF0BA6DE),
+                          content: Text('Please fill in all fields')
+                        ),
+                      );
+                      return;
+                    }
+
+                    final studentData = Student(
+                      studentID: student.studentID, 
+                      firstname: _firstNameController.text,
+                      lastname: _LastNameController.text,
+                      course: _courseController.text,
+                      year: _selectedYear,
+                      enrolled: _isEnrolled,
+                    );
+
+                    try {
+                      bool hasChanged = studentData.firstname != student.firstname ||
+                          studentData.lastname != student.lastname ||
+                          studentData.course != student.course ||
+                          studentData.year != student.year ||
+                          studentData.enrolled != student.enrolled;
+
+                      if (!hasChanged) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: Color(0xFF0BA6DE),
+                            content: Text('No changes were made to ${student.lastname}\'s details.'),
+                          ),
+                        );
+                        Navigator.pop(context);
+                      } else {
+                        context.read<StudentBloc>().add(UpdateStudent(studentData));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: Color(0xFF0BA6DE),
+                            content: Text('Successfully updated ${student.lastname}\'s details.'),
+                          ),
+                        );
+                        Navigator.pop(context);
+                      }
+                    } catch (e) {
+                      print('Error updating student: $e');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          backgroundColor: Color(0xFF0BA6DE),
+                          content: Text('Failed to save student: $e'),
+                        ),
+                      );
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromARGB(255, 11, 166, 222), 
+                    backgroundColor: Color(0xFF0BA6DE), 
                     minimumSize: Size(double.infinity, 60), 
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10), 
@@ -574,7 +968,7 @@ class _HomeState extends State<Home> {
                       ),
                     ),
                   ) 
-                )
+                ),
               ],
             ),
           )
@@ -582,5 +976,4 @@ class _HomeState extends State<Home> {
       },
     );
   }
-
 }

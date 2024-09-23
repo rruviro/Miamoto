@@ -54,17 +54,22 @@ class StudentBloc extends Bloc<StudentEvent, StudentState> {
     on<DeleteStudent>((event, emit) async {
       if (state is StudentLoaded) {
         try {
-          await repository.deleteStudent(event.studentID);
+          // Call the repository to delete the student using String ID
+          await repository.deleteStudent(int.parse(event.studentID));
+          
+          // Update the list of students after deletion
           final updatedStudents = (state as StudentLoaded)
               .students
               .where((student) => student.studentID != event.studentID)
               .toList();
           final updatedCount = updatedStudents.length;
+          
           emit(StudentLoaded(updatedStudents, updatedCount));
         } catch (e) {
-          emit(StudentError('Failed to delete student: $e'));
+          emit(const StudentError("Failed to delete student"));
         }
       }
     });
+
   }
 }
