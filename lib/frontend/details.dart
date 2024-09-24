@@ -3,6 +3,7 @@ import 'package:crud/backend/bloc/student_bloc.dart';
 import 'package:crud/backend/model/student.dart';
 import 'package:crud/frontend/home.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:uuid/uuid.dart';
@@ -120,18 +121,10 @@ class _detailState extends State<detail> {
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
                       ),
-                      suffix: Text(
-                        '2/25',
-                        style: TextStyle(
-                          color: Color.fromARGB(255, 11, 166, 222),
-                          fontSize: 12,
-                        ),
-                      ),
-                      suffixStyle: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 12,
-                      ),
                     ),
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(10),
+                    ],
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.done,
                     style: TextStyle(
@@ -158,18 +151,10 @@ class _detailState extends State<detail> {
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
                       ),
-                      suffix: Text(
-                        '2/23',
-                        style: TextStyle(
-                          color: Color.fromARGB(255, 11, 166, 222),
-                          fontSize: 12,
-                        ),
-                      ),
-                      suffixStyle: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 12,
-                      ),
                     ),
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(10),
+                    ],
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.done,
                     style: TextStyle(
@@ -197,18 +182,10 @@ class _detailState extends State<detail> {
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
-                  suffix: Text(
-                    '2/23', 
-                    style: TextStyle(
-                      color: Color.fromARGB(255, 11, 166, 222),
-                      fontSize: 12,
-                    ),
-                  ),
-                  suffixStyle: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 12,
-                  ),
                 ),
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(30),
+                ],
                 keyboardType: TextInputType.text,
                 textInputAction: TextInputAction.done,
                 style: TextStyle(
@@ -263,7 +240,32 @@ class _detailState extends State<detail> {
               ),
               validator: (value) => value == null ? 'Year is required' : null,
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 10),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(top: 10),
+                  child: Text('Enrolled', style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 13)),
+                ),
+                const Spacer(),
+                Transform.scale(
+                  scale: 0.8, // Adjust the scale factor to resize the switch
+                  child: Switch(
+                    value: _isEnrolled,
+                    onChanged: (value) {
+                      setState(() {
+                        _isEnrolled = value;
+                      });
+                    },
+                    activeColor: Color.fromARGB(255, 11, 166, 222), // Color when the switch is active
+                    inactiveThumbColor: Colors.red, // Color of the thumb when inactive
+                    inactiveTrackColor: Colors.grey, // Color of the track when inactive
+                  ),
+                )
+              ],
+            ),
+            SizedBox(height: 10),
             ElevatedButton(
               onPressed: () async {
                 if (_firstNameController.text.isEmpty ||
@@ -326,7 +328,7 @@ class _detailState extends State<detail> {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFF0BA6DE), 
-                minimumSize: Size(double.infinity, 60), 
+                minimumSize: Size(double.infinity, 50), 
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10), 
                 ),

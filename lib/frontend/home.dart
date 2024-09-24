@@ -336,7 +336,7 @@ class _HomeState extends State<Home> {
                                               Text(
                                                 student.enrolled ? 'Enrolled' : 'Not Enrolled',
                                                 style: GoogleFonts.inter(
-                                                  color: Colors.grey,
+                                                  color: student.enrolled ? Color.fromARGB(255, 11, 166, 222) : Colors.red,
                                                   fontSize: 11,
                                                   fontWeight: FontWeight.w400
                                                 ),
