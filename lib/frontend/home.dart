@@ -3,18 +3,19 @@ import 'package:crud/backend/bloc/student_bloc.dart';
 import 'package:crud/backend/model/student.dart';
 import 'package:crud/frontend/details.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class Home extends StatefulWidget {
-  final Student? student;
-  const Home({super.key, this.student});
+  const Home({super.key});
   @override
   State<Home> createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -24,7 +25,7 @@ class _HomeState extends State<Home> {
         backgroundColor: const Color.fromARGB(255, 11, 166, 222),
         title: Center(
           child: Text(
-            "Everyday is blue",
+            "Universidad ni lucio",
             style: GoogleFonts.inter(
               color: Colors.white,
               fontSize: 15,
@@ -140,12 +141,12 @@ class _HomeState extends State<Home> {
                     )
                   ),
                   Positioned(
-                    bottom: -26,
+                    bottom: -20,
                     right: -20,
                     child: Image.asset(
                       'resources/images/student.png',
-                      height: 250,
-                      width: 250,
+                      height: 220,
+                      width: 220,
                     )
                   )
                 ],
@@ -199,7 +200,7 @@ class _HomeState extends State<Home> {
               ),
             ),
             Container(
-              height: screenHeight,
+              height: 550,
               child: BlocBuilder<StudentBloc, StudentState>(
                 builder: (context, state) {
                   if (state is StudentLoading) {
@@ -368,11 +369,10 @@ class _HomeState extends State<Home> {
   }
 
 void _showCreateDialog(BuildContext context) {
+  
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _courseController = TextEditingController();
-  int _countFirstName = 0;
-  int _countLastName = 0;
   String _selectedYear = 'First Year';
   bool _isEnrolled = false;
 
@@ -419,7 +419,7 @@ void _showCreateDialog(BuildContext context) {
           ),
         ),
         content: Container(
-          height: 300,
+          height: 270,
           width: double.infinity,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -438,12 +438,11 @@ void _showCreateDialog(BuildContext context) {
                           borderSide: BorderSide(color: Color.fromARGB(255, 11, 166, 222)),
                         ),
                         hintText: 'First Name',
-                        hintStyle: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-                        suffix: Text('$_countFirstName/25', style: TextStyle(color: Color.fromARGB(255, 11, 166, 222), fontSize: 12)),
+                        hintStyle: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)
                       ),
-                      onChanged: (value) {
-                        _countFirstName = value.length;
-                      },
+                      inputFormatters: [
+                        LengthLimitingTextInputFormatter(10),
+                      ],
                       keyboardType: TextInputType.text,
                       textInputAction: TextInputAction.done,
                       style: TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.w500),
@@ -463,14 +462,14 @@ void _showCreateDialog(BuildContext context) {
                         ),
                         hintText: 'Last Name',
                         hintStyle: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-                        suffix: Text('$_countLastName/25', style: TextStyle(color: Color.fromARGB(255, 11, 166, 222), fontSize: 12)),
                       ),
-                      onChanged: (value) {
-                        _countLastName = value.length;
-                      },
+                      inputFormatters: [
+                        LengthLimitingTextInputFormatter(10),
+                      ],
                       keyboardType: TextInputType.text,
                       textInputAction: TextInputAction.done,
                       style: TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.w500),
+                      validator: (value) => value == null || value.isEmpty ? 'Last name is required' : null,
                     ),
                   ),
                 ],
@@ -488,6 +487,9 @@ void _showCreateDialog(BuildContext context) {
                   hintText: 'Course',
                   hintStyle: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
                 ),
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(30),
+                ],
                 keyboardType: TextInputType.text,
                 textInputAction: TextInputAction.done,
                 style: TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.w500),
@@ -560,7 +562,7 @@ void _showCreateDialog(BuildContext context) {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF0BA6DE),
-                  minimumSize: Size(double.infinity, 60),
+                  minimumSize: Size(double.infinity, 50),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),

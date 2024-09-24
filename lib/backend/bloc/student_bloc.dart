@@ -9,29 +9,34 @@ class StudentBloc extends Bloc<StudentEvent, StudentState> {
   final StudentRepository repository;
 
   StudentBloc(this.repository) : super(StudentLoading()) {
+
     on<LoadStudents>((event, emit) async {
       try {
         final students = await repository.fetchStudents();
         final studentCount = students.length;
-        print('Data loaded: $studentCount students found');
-        emit(StudentLoaded(students, studentCount));
+
+        if (studentCount == 0) {
+          emit(const StudentError("No students found"));
+        } else {
+          emit(StudentLoaded(students, studentCount));
+        }
       } catch (e) {
-        print('Error loading data: $e');
         emit(const StudentError("Failed to load students"));
       }
     });
 
     on<AddStudent>((event, emit) async {
-      if (state is StudentLoaded) {
-        try {
-          await repository.addStudent(event.student);
-          final currentStudents = (state as StudentLoaded).students;
-          final updatedStudents = List<Student>.from(currentStudents)..add(event.student);
-          final updatedCount = updatedStudents.length;
-          emit(StudentLoaded(updatedStudents, updatedCount));
-        } catch (e) {
-          emit(const StudentError("Failed to add student"));
-        }
+      try {
+        emit(StudentLoading()); // Emit loading state
+        await repository.addStudent(event.student);
+
+        // After adding the student, re-fetch the students
+        final students = await repository.fetchStudents();
+        final updatedCount = students.length;
+
+        emit(StudentLoaded(students, updatedCount)); // Emit updated list
+      } catch (e) {
+        emit(const StudentError("Failed to add student"));
       }
     });
 
