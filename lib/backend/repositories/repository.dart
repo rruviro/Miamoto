@@ -65,7 +65,7 @@ class StudentRepository {
               'firstname': student.firstname,
               'lastname': student.lastname,
               'course': student.course,
-              'year': student.year,
+              'year': student.year, // Send year as a string
               'enrolled': student.enrolled ? '1' : '0',
           },
       );
