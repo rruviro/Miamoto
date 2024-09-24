@@ -3,6 +3,7 @@ import 'package:crud/backend/bloc/student_bloc.dart';
 import 'package:crud/backend/model/student.dart';
 import 'package:crud/frontend/home.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:uuid/uuid.dart';
@@ -21,7 +22,7 @@ class _detailState extends State<detail> {
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _courseController = TextEditingController();
   String _selectedYear = "First Year";
-  bool _isEnrolled = false;
+  bool _isEnrolled = true;
 
   @override
   void initState() {
@@ -63,7 +64,7 @@ class _detailState extends State<detail> {
                   ),
                 ),
                 Text(
-                  'Change detail of',
+                  'Change detail of ${widget.student!.lastname}\'s',
                   style: GoogleFonts.inter(
                     color: const Color.fromARGB(255, 255, 255, 255),
                     fontSize: 11,
@@ -120,18 +121,10 @@ class _detailState extends State<detail> {
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
                       ),
-                      suffix: Text(
-                        '2/25',
-                        style: TextStyle(
-                          color: Color.fromARGB(255, 11, 166, 222),
-                          fontSize: 12,
-                        ),
-                      ),
-                      suffixStyle: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 12,
-                      ),
                     ),
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(15),
+                    ],
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.done,
                     style: TextStyle(
@@ -158,18 +151,10 @@ class _detailState extends State<detail> {
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
                       ),
-                      suffix: Text(
-                        '2/23',
-                        style: TextStyle(
-                          color: Color.fromARGB(255, 11, 166, 222),
-                          fontSize: 12,
-                        ),
-                      ),
-                      suffixStyle: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 12,
-                      ),
                     ),
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(15),
+                    ],
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.done,
                     style: TextStyle(
@@ -197,18 +182,10 @@ class _detailState extends State<detail> {
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
-                  suffix: Text(
-                    '2/23', 
-                    style: TextStyle(
-                      color: Color.fromARGB(255, 11, 166, 222),
-                      fontSize: 12,
-                    ),
-                  ),
-                  suffixStyle: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 12,
-                  ),
                 ),
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(40),
+                ],
                 keyboardType: TextInputType.text,
                 textInputAction: TextInputAction.done,
                 style: TextStyle(
@@ -351,7 +328,7 @@ class _detailState extends State<detail> {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFF0BA6DE), 
-                minimumSize: Size(double.infinity, 60), 
+                minimumSize: Size(double.infinity, 50), 
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10), 
                 ),

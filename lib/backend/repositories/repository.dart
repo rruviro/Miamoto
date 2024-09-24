@@ -46,7 +46,7 @@ class StudentRepository {
           'lastname': student.lastname,
           'course': student.course,
           'year': student.year, // Send year as a string
-          'enrolled': student.enrolled ? '1' : '0',
+          'enrolled': student.enrolled ? 'false' : 'true',
         },
       );
     } catch (e) {
@@ -65,8 +65,8 @@ class StudentRepository {
               'firstname': student.firstname,
               'lastname': student.lastname,
               'course': student.course,
-              'year': student.year, // Send year as a string
-              'enrolled': student.enrolled ? '1' : '0',
+              'year': student.year, 
+              'enrolled': student.enrolled ? 'false' : 'true',
           },
       );
 
